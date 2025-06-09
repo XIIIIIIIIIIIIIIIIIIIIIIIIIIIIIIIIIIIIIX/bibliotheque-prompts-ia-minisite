@@ -1,0 +1,172 @@
+:root {
+      --background: #f8fafd;
+      --primary: #22223b;
+      --secondary: #4a4e69;
+      --accent: #9a8c98;
+      --border: #e7e9ec;
+      --tag-bg: #e3e5ec;
+      --tag-txt: #7d7c83;
+      --radius: 18px;
+      --shadow: 0 2px 8px rgba(120,120,120,0.04);
+      --transition: 0.18s all cubic-bezier(.68,-0.25,.27,1.17);
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Outfit', Arial, sans-serif;
+      background: var(--background);
+      color: var(--primary);
+      margin: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 900px;
+      margin: 36px auto 0 auto;
+      padding: 0 24px 48px 24px;
+    }
+    header {
+      text-align: left;
+      margin-bottom: 26px;
+    }
+    header h1 {
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 2.2rem;
+      letter-spacing: -0.5px;
+    }
+    header p {
+      color: var(--secondary);
+      margin: 0;
+      font-size: 1.06rem;
+      letter-spacing: 0.03rem;
+    }
+    .search-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .search-bar input {
+      width: 100%;
+      font-size: 1.05rem;
+      padding: 13px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      outline: none;
+      background: #fff;
+      transition: border-color var(--transition);
+      font-family: inherit;
+      color: var(--primary);
+      margin-right: 8px;
+    }
+    .search-bar input:focus {
+      border-color: var(--accent);
+    }
+    .tags-filter {
+      margin-bottom: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .tag-btn {
+      background: var(--tag-bg);
+      color: var(--tag-txt);
+      border: none;
+      outline: none;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.98rem;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      font-family: inherit;
+      position: relative;
+      z-index: 1;
+    }
+    .tag-btn.selected, .tag-btn:hover {
+      background: var(--accent);
+      color: white;
+    }
+    .category-group {
+      margin-bottom: 38px;
+    }
+    .category-title {
+      font-size: 1.16rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 11px;
+      letter-spacing: 0.01em;
+      margin-left: 2px;
+    }
+    .prompts-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 17px;
+    }
+    @media (max-width: 750px) {
+      .prompts-list {
+        grid-template-columns: 1fr;
+      }
+    }
+    .prompt-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px 18px 16px 18px;
+      box-shadow: var(--shadow);
+      border: 1.2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow var(--transition), border-color var(--transition);
+      position: relative;
+      min-height: 160px;
+    }
+    .prompt-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+      color: var(--primary);
+      letter-spacing: -0.01em;
+    }
+    .prompt-text {
+      font-size: 0.99rem;
+      color: var(--secondary);
+      margin-bottom: 14px;
+      white-space: pre-line;
+      word-break: break-word;
+    }
+    .prompt-tags {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+    .prompt-tag {
+      font-size: 0.84rem;
+      background: var(--tag-bg);
+      color: var(--tag-txt);
+      padding: 2px 11px;
+      border-radius: 777px;
+      margin: 0;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      user-select: none;
+      border: none;
+      outline: none;
+      font-family: inherit;
+    }
+    .prompt-tag:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+    .no-result {
+      color: var(--accent);
+      text-align: center;
+      font-size: 1.12rem;
+      margin: 25px 0 35px 0;
+    }
