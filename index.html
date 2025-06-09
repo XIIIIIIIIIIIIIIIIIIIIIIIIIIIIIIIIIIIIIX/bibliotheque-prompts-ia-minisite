@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bibliothèque de Prompts IA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: #f8fafd;
+      --primary: #22223b;
+      --secondary: #4a4e69;
+      --accent: #9a8c98;
+      --border: #e7e9ec;
+      --tag-bg: #e3e5ec;
+      --tag-txt: #7d7c83;
+      --radius: 18px;
+      --shadow: 0 2px 8px rgba(120,120,120,0.04);
+      --transition: 0.18s all cubic-bezier(.68,-0.25,.27,1.17);
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Outfit', Arial, sans-serif;
+      background: var(--background);
+      color: var(--primary);
+      margin: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 900px;
+      margin: 36px auto 0 auto;
+      padding: 0 24px 48px 24px;
+    }
+    header {
+      text-align: left;
+      margin-bottom: 26px;
+    }
+    header h1 {
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 2.2rem;
+      letter-spacing: -0.5px;
+    }
+    header p {
+      color: var(--secondary);
+      margin: 0;
+      font-size: 1.06rem;
+      letter-spacing: 0.03rem;
+    }
+    .search-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .search-bar input {
+      width: 100%;
+      font-size: 1.05rem;
+      padding: 13px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      outline: none;
+      background: #fff;
+      transition: border-color var(--transition);
+      font-family: inherit;
+      color: var(--primary);
+      margin-right: 8px;
+    }
+    .search-bar input:focus {
+      border-color: var(--accent);
+    }
+    .tags-filter {
+      margin-bottom: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .tag-btn {
+      background: var(--tag-bg);
+      color: var(--tag-txt);
+      border: none;
+      outline: none;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.98rem;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      font-family: inherit;
+      position: relative;
+      z-index: 1;
+    }
+    .tag-btn.selected, .tag-btn:hover {
+      background: var(--accent);
+      color: white;
+    }
+    .category-group {
+      margin-bottom: 38px;
+    }
+    .category-title {
+      font-size: 1.16rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 11px;
+      letter-spacing: 0.01em;
+      margin-left: 2px;
+    }
+    .prompts-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 17px;
+    }
+    @media (max-width: 750px) {
+      .prompts-list {
+        grid-template-columns: 1fr;
+      }
+    }
+    .prompt-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px 18px 16px 18px;
+      box-shadow: var(--shadow);
+      border: 1.2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow var(--transition), border-color var(--transition);
+      position: relative;
+      min-height: 160px;
+    }
+    .prompt-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+      color: var(--primary);
+      letter-spacing: -0.01em;
+    }
+    .prompt-text {
+      font-size: 0.99rem;
+      color: var(--secondary);
+      margin-bottom: 14px;
+      white-space: pre-line;
+      word-break: break-word;
+    }
+    .prompt-tags {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+    .prompt-tag {
+      font-size: 0.84rem;
+      background: var(--tag-bg);
+      color: var(--tag-txt);
+      padding: 2px 11px;
+      border-radius: 777px;
+      margin: 0;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      user-select: none;
+      border: none;
+      outline: none;
+      font-family: inherit;
+    }
+    .prompt-tag:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+    .no-result {
+      color: var(--accent);
+      text-align: center;
+      font-size: 1.12rem;
+      margin: 25px 0 35px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Bibliothèque de Prompts IA</h1>
+      <p>Explorez et inspirez-vous de prompts optimisés, classés par catégorie. Filtrez par tags ou recherchez en temps réel.</p>
+    </header>
+    <div class="search-bar">
+      <input type="search" id="searchInput" placeholder="Recherche rapide de prompts, catégories, tags…">
+    </div>
+    <div class="tags-filter" id="tagsFilter"></div>
+    <div id="promptsArea"></div>
+  </div>
+  <script>
+    // ---- Prompts DATA ----
+    const PROMPTS = [
+      {
+        id: 1,
+        title: "Optimisation SEO pour articles de blog",
+        prompt: "Analyse cet article et suggère des améliorations SEO concrètes, en détaillant pour chaque point (structure, mots-clés, méta-descriptions, lisibilité) :",
+        category: "SEO",
+        tags: ["SEO", "article", "optimisation"]
+      },
+      {
+        id: 2,
+        title: "Création de script vidéo accrocheur",
+        prompt: "Rédige un script YouTube de 3 minutes sur [thème], avec une introduction percutante, une structure logique et un appel à l'action final.",
+        category: "YouTube",
+        tags: ["YouTube", "script", "vidéo"]
+      },
+      {
+        id: 3,
+        title: "Générateur de carrousel LinkedIn",
+        prompt: "Donne-moi 5 idées de carrousels LinkedIn pour [secteur], avec un titre accrocheur pour chaque slide et une accroche finale.",
+        category: "Social Media",
+        tags: ["LinkedIn", "carrousel", "content"]
+      },
+      {
+        id: 4,
+        title: "Automatisation de veille concurrentielle",
+        prompt: "Propose un flux de travail automatisé pour surveiller les concurrents dans [secteur], incluant outils à intégrer et alertes automatisées.",
+        category: "Automatisation",
+        tags: ["veille", "automatisation", "workflow"]
+      },
+      {
+        id: 5,
+        title: "Résumé automatique d’e-mails",
+        prompt: "Synthétise ce mail en 3 points clés avec une tonalité professionnelle, prêt à être transféré à un collègue.",
+        category: "Automatisation",
+        tags: ["email", "résumé", "automatisation"]
+      },
+      {
+        id: 6,
+        title: "Titre d’article optimisé pour le SEO",
+        prompt: "Suggère 5 titres optimisés SEO pour cet article, en intégrant les mots-clés principaux et une promesse forte.",
+        category: "SEO",
+        tags: ["SEO", "titre", "copywriting"]
+      },
+      {
+        id: 7,
+        title: "Checklist publication YouTube",
+        prompt: "Dresse la checklist complète à suivre avant de publier une vidéo sur YouTube pour maximiser la portée organique.",
+        category: "YouTube",
+        tags: ["YouTube", "checklist", "publication"]
+      },
+      {
+        id: 8,
+        title: "Post LinkedIn viral",
+        prompt: "Rédige un post LinkedIn prêt à devenir viral sur [sujet], en misant sur l’émotion et l’engagement.",
+        category: "Social Media",
+        tags: ["LinkedIn", "post", "viral"]
+      },
+      {
+        id: 9,
+        title: "Prompt ChatGPT pour génération de formulaires",
+        prompt: "Propose un prompt pour générer un formulaire web efficace sur [sujet], en prenant en compte UX et validation.",
+        category: "Automatisation",
+        tags: ["formulaire", "ChatGPT", "UX"]
+      },
+      {
+        id: 10,
+        title: "Transcription automatique de meeting vidéo",
+        prompt: "Génère une transcription claire et résumée de cette réunion vidéo, avec une liste des décisions et actions à suivre.",
+        category: "Automatisation",
+        tags: ["transcription", "meeting", "automatisation"]
+      },
+      {
+        id: 11,
+        title: "Analyse de chaîne YouTube concurrente",
+        prompt: "Analyse cette chaîne YouTube : synthétise ses points forts/faibles, stratégies de contenu, fréquence idéale et opportunités à saisir.",
+        category: "YouTube",
+        tags: ["YouTube", "analyse", "concurrents"]
+      },
+      {
+        id: 12,
+        title: "Suggestions de hooks pour posts LinkedIn",
+        prompt: "Donne-moi 7 hooks d’introduction irrésistibles pour un post LinkedIn sur [thématique].",
+        category: "Social Media",
+        tags: ["LinkedIn", "hook", "copywriting"]
+      }
+    ];
+
+    // ------ Get unique tags ------
+    function getAllTags() {
+      const tags = new Set();
+      PROMPTS.forEach(p => p.tags.forEach(tag => tags.add(tag)));
+      return Array.from(tags).sort((a, b) => a.localeCompare(b,"fr",{sensitivity:'base'}));
+    }
+
+    // ------ Get unique categories ------
+    function getAllCategories() {
+      const cats = new Set();
+      PROMPTS.forEach(p => cats.add(p.category));
+      return Array.from(cats).sort((a, b) => a.localeCompare(b,"fr",{sensitivity:'base'}));
+    }
+
+    // ------ State ------
+    let state = {
+      search: "",
+      tag: null,
+    };
+
+    // ------ Render Tags Filter ------
+    function renderTagsFilter() {
+      const allTags = getAllTags();
+      const tagsFilter = document.getElementById("tagsFilter");
+      tagsFilter.innerHTML = '';
+      const btnAll = document.createElement('button');
+      btnAll.className = 'tag-btn' + (state.tag === null ? ' selected' : '');
+      btnAll.textContent = 'Tous les tags';
+      btnAll.onclick = ()=>{state.tag=null;renderAll();};
+      tagsFilter.appendChild(btnAll);
+
+      allTags.forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className = 'tag-btn' + (state.tag === tag ? ' selected' : '');
+        btn.textContent = tag;
+        btn.onclick = ()=>{state.tag=tag;renderAll();};
+        tagsFilter.appendChild(btn);
+      });
+    }
+
+    // ------ Filter & Render Prompts ------
+    function filterPrompts() {
+      let prompts = PROMPTS;
+      if (state.tag) {
+        prompts = prompts.filter(p=>p.tags.includes(state.tag));
+      }
+      if (state.search.trim()!=="") {
+        const q = state.search.trim().toLowerCase();
+        prompts = prompts.filter(p=>
+          p.title.toLowerCase().includes(q) ||
+          p.prompt.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q) ||
+          p.tags.some(tag=>tag.toLowerCase().includes(q))
+        );
+      }
+      return prompts;
+    }
+
+    function groupByCategory(prompts) {
+      const group = {};
+      prompts.forEach(p=>{
+        if (!group[p.category]) group[p.category]=[];
+        group[p.category].push(p);
+      });
+      return group;
+    }
+
+    function highlight(txt, query) {
+      if (!query) return txt;
+      const escQ = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return txt.replace(new RegExp(`(${escQ})`,'gi'),"<mark>$1</mark>");
+    }
+
+    function renderAll() {
+      renderTagsFilter();
+      const area = document.getElementById("promptsArea");
+      const searchQuery = state.search.trim();
+      const filtered = filterPrompts();
+      if(filtered.length===0) {
+        area.innerHTML = '<div class="no-result">Aucun prompt ne correspond à vos critères.</div>';
+        return;
+      }
+      const grouped = groupByCategory(filtered);
+
+      // Content
+      let html = '';
+      Object.entries(grouped).forEach(([cat, prompts])=>{
+        html += `<section class="category-group"><div class="category-title">${cat}</div><div class="prompts-list">`;
+        prompts.forEach(p=>{
+          html += `<div class="prompt-card">` +
+            `<div class="prompt-title">${highlight(p.title, searchQuery)}</div>` +
+            `<div class="prompt-text">${highlight(p.prompt, searchQuery)}</div>` +
+            `<div class="prompt-tags">` +
+            p.tags.map(tag=>`<button class="prompt-tag" onclick="selectTag('${tag}')">${tag}</button>`).join('') +
+            `</div>` +
+          `</div>`;
+        });
+        html += `</div></section>`;
+      });
+      area.innerHTML = html;
+    }
+
+    // ---- Tag click from prompt card ------
+    window.selectTag = function(tag) {
+      state.tag = tag;
+      document.getElementById('searchInput').blur(); // UX: close keyb on mobile
+      renderAll();
+      window.scrollTo({top: 0, behavior: "smooth"});
+    }
+
+    // ----- Search ------
+    document.getElementById("searchInput").addEventListener("input", e=>{
+      state.search = e.target.value;
+      renderAll();
+    });
+
+    // ---- First render -----
+    renderAll();
+  </script>
+</body>
+</html>
